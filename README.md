@@ -263,6 +263,8 @@ To secure communication between tiers, separate Security Groups were configured.
 | MySQL/Aurora | 3306 | app-sg | DB access only from App Tier |
 
 ---
+<img width="1024" height="1536" alt="AWS Security Group Inbound Rules Overview" src="https://github.com/user-attachments/assets/af29fa89-8f2a-442f-ba18-c6c1c5c3056a" />
+
 
 ### 🔒 Result
 

@@ -229,6 +229,16 @@ curl -X POST -H "Content-Type: application/json" \
 ```
 
 ---
+---
+
+# 🌐 Live Application
+
+🚀 **Application URL**
+
+http://YOUR_WEB_SERVER_PUBLIC_IP
+
+> This application is deployed on AWS using Auto Scaling and a 3-Tier Architecture.
+
 
 # 📌 Key Learning Outcomes
 

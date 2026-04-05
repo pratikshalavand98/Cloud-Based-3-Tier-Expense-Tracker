@@ -1,14 +1,14 @@
 # ☁️ Cloud-Based 3-Tier Expense Tracker (AWS Deployment)
 
+<img width="1299" height="1210" alt="Expense tracker app deployment architecture" src="https://github.com/user-attachments/assets/e5699c8c-92ba-4469-8ee0-dc41da5668b1" />
+
 A fully deployed **3-Tier Cloud Application on AWS** demonstrating real-world production architecture using:
 
 - Auto Scaling  
 - Reverse Proxy (Nginx)  
 - Private Networking (VPC)  
-- SSH Jump Host (Bastion via Web Server)  
+- SSH Jump Host (Bastion)  
 - Database Isolation  
-
-This project simulates how real SaaS applications are deployed in production cloud environments.
 
 ---
 
@@ -26,14 +26,10 @@ This project simulates how real SaaS applications are deployed in production clo
 
 ## 🌐 1️⃣ VPC Creation
 
-We created a custom VPC using a large private IP range.
-
 | Component | Value |
 |---|---|
 | **VPC CIDR** | `10.0.0.0/16` |
 | Total IPs | 65,536 |
-
-This CIDR allows creation of multiple subnets for a 3-tier architecture.
 
 ---
 
@@ -49,7 +45,20 @@ This CIDR allows creation of multiple subnets for a 3-tier architecture.
 
 ## 📷 Architecture Diagram
 
-<img width="1299" height="1210" src="https://github.com/user-attachments/assets/86e3cdd8-6b19-4d98-94c2-0e2978f42bfd" />
+<img width="1299" height="1210" alt="Expense tracker app deployment architecture" src="https://github.com/user-attachments/assets/5558fe34-f1f2-4ff3-85bd-d320e0ca0da0" />
+
+
+---
+
+## 🖥️ EC2 Instances Overview
+
+<img width="1919" height="857" alt="servers" src="https://github.com/user-attachments/assets/f79bb526-fec9-4be2-bfc3-1b54e815c02e" />
+
+
+👉 Shows:
+- Web Server (Public)
+- App Server (Private)
+- DB Server (Private)
 
 ---
 
@@ -59,8 +68,6 @@ Private servers **cannot be accessed directly from internet**.
 We use the **Web Server as Bastion Host**.
 
 ### Copy Private Keys to Web Server
-
-Run from your local machine:
 
 ```bash
 scp -i path/location.pem keyname.pem ubuntu@WEB_PUBLIC_IP:~
@@ -72,19 +79,17 @@ scp -i path/location.pem keyname.pem ubuntu@WEB_PUBLIC_IP:~
 ssh -i location.pem ubuntu@WEB_PUBLIC_IP
 ```
 
-### SSH into App Server from Web Server
+### SSH into App Server
 
 ```bash
 ssh -i keyname.pem ubuntu@APP_PRIVATE_IP
 ```
 
-### SSH into DB Server from Web Server
+### SSH into DB Server
 
 ```bash
 ssh -i keyname.pem ubuntu@DB_PRIVATE_IP
 ```
-
-This simulates **real production security**.
 
 ---
 
@@ -100,9 +105,9 @@ This simulates **real production security**.
 
 # 🔄 Request Flow
 
-User → Internet → Web Server (Auto Scaling)  
+User → Internet → Web Server  
 ↓ Reverse Proxy  
-App Server (Elastic IP used internally)  
+App Server  
 ↓  
 DB Server  
 
@@ -112,11 +117,14 @@ DB Server
 
 - Web Servers in **Auto Scaling Group**
 - Reverse Proxy → internal routing
-- Elastic IP on App Server for stable communication
+- Elastic IP on App Server  
 
-## 📷 Auto Scaling Screenshot
+---
 
-<img width="1919" height="858" src="https://github.com/user-attachments/assets/da43c5ac-fd23-4f00-85cb-1df811112bd1" />
+## 📷 Auto Scaling
+
+<img width="1919" height="858" alt="autoscaling" src="https://github.com/user-attachments/assets/ced15d3c-4c4b-4832-a94e-e206575590b4" />
+
 
 ---
 
@@ -132,9 +140,10 @@ DB Server
 
 ---
 
-## 📷 Application Screenshot
+## 📷 Application UI
 
-<img width="1919" height="868" src="https://github.com/user-attachments/assets/63b8e912-b27b-455d-9ef3-1b491b10b259" />
+<img width="1919" height="868" alt="Application" src="https://github.com/user-attachments/assets/14f23a80-f825-43d3-9b07-4700a978cb02" />
+
 
 ---
 
@@ -142,7 +151,7 @@ DB Server
 
 ---
 
-# 🟢 Web Server Setup (Public EC2)
+## 🟢 Web Server Setup
 
 ```bash
 sudo apt update
@@ -150,7 +159,8 @@ sudo apt install nginx -y
 sudo nano /var/www/html/index.html
 ```
 
-### Reverse Proxy Setup
+### Reverse Proxy
+
 ```bash
 sudo nano /etc/nginx/sites-enabled/default
 ```
@@ -168,7 +178,7 @@ sudo ufw allow 80
 
 ---
 
-# 🟡 App Server Setup (Private EC2)
+## 🟡 App Server Setup
 
 ```bash
 sudo apt update
@@ -183,20 +193,19 @@ Enable DB connections:
 sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
 ```
 
-Change:
 ```ini
 bind-address = 0.0.0.0
 ```
 
 ```bash
-sudo service mariadb restart
+sudo systemctl restart mariadb
 sudo systemctl restart nginx
 sudo systemctl restart php8.3-fpm
 ```
 
 ---
 
-# 🔵 Database Server Setup (Private EC2)
+## 🔵 Database Server Setup
 
 ```bash
 sudo mysql
@@ -215,7 +224,7 @@ CREATE TABLE expenses(
 ```
 
 ```bash
-sudo service mariadb restart
+sudo systemctl restart mariadb
 ```
 
 ---
@@ -229,12 +238,8 @@ curl -X POST -H "Content-Type: application/json" \
 ```
 
 ---
----
- ---
 
 # 🔐 Security Groups Configuration
-
-To secure communication between tiers, separate Security Groups were configured.
 
 ## 🟢 Web Server Security Group (web-sg)
 
@@ -259,27 +264,23 @@ To secure communication between tiers, separate Security Groups were configured.
 
 | Type | Port | Source | Purpose |
 |---|---|---|---|
-| SSH | 22 | app-sg | Admin access via App Server |
+| SSH | 22 | app-sg | Admin via App Server |
 | MySQL/Aurora | 3306 | app-sg | DB access only from App Tier |
 
 ---
-<img width="1024" height="1536" alt="AWS Security Group Inbound Rules Overview" src="https://github.com/user-attachments/assets/af29fa89-8f2a-442f-ba18-c6c1c5c3056a" />
+
+## 📷 Security Groups
+
+<img width="1024" height="1536" alt="AWS Security Group Inbound Rules Overview" src="https://github.com/user-attachments/assets/27c67e73-51eb-4486-8e1b-0be18ad15499" />
 
 
-### 🔒 Result
+---
 
-✔ Database is NOT public  
-✔ App server is NOT public  
-✔ Only Web Server is exposed to internet  
-✔ Secure tier-to-tier communication
 # 🌐 Live Application
-
-🚀 **Application URL**
 
 http://YOUR_WEB_SERVER_PUBLIC_IP
 
-> This application is deployed on AWS using Auto Scaling and a 3-Tier Architecture.
-
+---
 
 # 📌 Key Learning Outcomes
 
@@ -294,6 +295,9 @@ http://YOUR_WEB_SERVER_PUBLIC_IP
 # 👩‍💻 Author
 
 **Pratiksha Lavand**
+
+🔗 LinkedIn:  https://www.linkedin.com/in/pratiksha-lavand/
+🔗 GitHub: https://github.com/pratikshalavand98/
 
 ---
 

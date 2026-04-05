@@ -230,7 +230,46 @@ curl -X POST -H "Content-Type: application/json" \
 
 ---
 ---
+ ---
 
+# 🔐 Security Groups Configuration
+
+To secure communication between tiers, separate Security Groups were configured.
+
+## 🟢 Web Server Security Group (web-sg)
+
+| Type | Port | Source | Purpose |
+|---|---|---|---|
+| SSH | 22 | My IP | Admin access |
+| HTTP | 80 | 0.0.0.0/0 | Public website access |
+
+---
+
+## 🟡 App Server Security Group (app-sg)
+
+| Type | Port | Source | Purpose |
+|---|---|---|---|
+| SSH | 22 | web-sg | SSH via Web Server |
+| HTTP | 80 | web-sg | Reverse proxy traffic |
+| MySQL/Aurora | 3306 | db-sg | Database connection |
+
+---
+
+## 🔵 Database Server Security Group (db-sg)
+
+| Type | Port | Source | Purpose |
+|---|---|---|---|
+| SSH | 22 | app-sg | Admin access via App Server |
+| MySQL/Aurora | 3306 | app-sg | DB access only from App Tier |
+
+---
+
+### 🔒 Result
+
+✔ Database is NOT public  
+✔ App server is NOT public  
+✔ Only Web Server is exposed to internet  
+✔ Secure tier-to-tier communication
 # 🌐 Live Application
 
 🚀 **Application URL**

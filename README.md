@@ -226,6 +226,15 @@ GRANT ALL PRIVILEGES ON expense_app.* TO 'appuser'@'10.0.2.%';
 
 FLUSH PRIVILEGES;
 ```
+Enable App connections:
+
+```bash
+sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
+```
+
+```ini
+bind-address = 0.0.0.0
+```
 
 ```bash
 sudo systemctl restart mariadb

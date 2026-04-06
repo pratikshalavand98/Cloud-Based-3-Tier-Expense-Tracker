@@ -82,13 +82,13 @@ ssh -i location.pem ubuntu@WEB_PUBLIC_IP
 ### SSH into App Server
 
 ```bash
-ssh -i keyname.pem ubuntu@APP_PRIVATE_IP
+ sudo ssh -i /home/ubuntu/keyname.pem ubuntu@APP_PRIVATE_IP
 ```
 
 ### SSH into DB Server
 
 ```bash
-ssh -i keyname.pem ubuntu@DB_PRIVATE_IP
+ sudo ssh -i /home/ubuntu/keyname.pem ubuntu@DB_PRIVATE_IP
 ```
 
 ---

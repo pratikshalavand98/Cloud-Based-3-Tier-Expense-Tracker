@@ -221,6 +221,10 @@ CREATE TABLE expenses(
  amount DECIMAL(10,2),
  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE USER 'appuser'@'10.0.2.%' IDENTIFIED BY 'Pass@123';
+GRANT ALL PRIVILEGES ON expense_app.* TO 'appuser'@'10.0.2.%';
+
+FLUSH PRIVILEGES;
 ```
 
 ```bash
